@@ -180,6 +180,7 @@ class OrbeonRunner(models.Model):
 
     @api.multi
     def copy(self, default=None):
+        default.update({ 'is_merged' : False })
         runner = super(OrbeonRunner, self).copy(default)
         ctx = self._context.copy()
         runner.with_context(ctx).merge_current_builder()
@@ -189,11 +190,7 @@ class OrbeonRunner(models.Model):
     def can_merge(self):
         """Can this Runner (xml) be merged with a new current Builder? """
         self.ensure_one()
-
-        if self.is_merged or not self.xml:
-            return False
-        else:
-            return self.any_new_current_builder
+        return not (self.is_merged or not self.xml)
 
     @api.multi
     @api.returns('self')
